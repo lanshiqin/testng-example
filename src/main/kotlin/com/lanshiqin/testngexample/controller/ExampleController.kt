@@ -2,6 +2,7 @@ package com.lanshiqin.testngexample.controller
 
 import com.alibaba.fastjson.JSON
 import com.lanshiqin.testngexample.base.ApiResponse
+import com.lanshiqin.testngexample.exception.ApiException
 import com.lanshiqin.testngexample.service.IExampleService
 import com.lanshiqin.testngexample.vm.AddModel
 import org.slf4j.Logger
@@ -11,7 +12,7 @@ import org.springframework.util.ObjectUtils
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.lang.Exception
+import kotlin.Exception
 
 @RestController
 class ExampleController {
@@ -24,20 +25,24 @@ class ExampleController {
     lateinit var exampleService: IExampleService
 
     @PostMapping("/addFunction")
-    fun addFunction(@RequestBody addModel: AddModel) :ApiResponse<Int>{
-        logger.info("addFunction 入参:{}",JSON.toJSONString(addModel))
-        if (ObjectUtils.isEmpty(addModel.numX)){
-            return ApiResponse.fail(ApiResponse.BUSINESS_EXCEPTION,"参数numX不能为空")
+    fun addFunction(@RequestBody addModel: AddModel): ApiResponse<Int> {
+        logger.info("addFunction 入参:{}", JSON.toJSONString(addModel))
+        if (ObjectUtils.isEmpty(addModel.numX)) {
+            return ApiResponse.fail(ApiResponse.BUSINESS_EXCEPTION, "参数numX不能为空")
         }
-        if (ObjectUtils.isEmpty(addModel.numY)){
-            return ApiResponse.fail(ApiResponse.BUSINESS_EXCEPTION,"参数numY不能为空")
+        if (ObjectUtils.isEmpty(addModel.numY)) {
+            return ApiResponse.fail(ApiResponse.BUSINESS_EXCEPTION, "参数numY不能为空")
         }
         return try {
-            val result = exampleService.addFunction(addModel.numX!!,addModel.numY!!)
-            ApiResponse.success("计算结果",result)
-        }catch (e: Exception){
+            val result = exampleService.addFunction(addModel.numX!!, addModel.numY!!)
+            ApiResponse.success("计算结果", result)
+        } catch (e: ApiException) {
+            logger.error("业务异常:{}", e.message)
+            ApiResponse.fail(e.code, e.message!!)
+        } catch (e: Exception) {
+            logger.error("系统异常:{}", e.message)
             e.printStackTrace()
-            ApiResponse.fail(ApiResponse.SYSTEM_EXCEPTION,"系统异常")
+            ApiResponse.fail(ApiResponse.SYSTEM_EXCEPTION, "系统异常")
         }
     }
 

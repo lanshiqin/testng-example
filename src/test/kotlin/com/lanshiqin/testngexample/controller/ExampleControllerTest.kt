@@ -49,7 +49,7 @@ class ExampleControllerTest {
         val mockReturn = data["mockReturn"]!!.toString().toDouble().toInt()
         Mockito.`when`(exampleService.addFunction(addModel.numX!!,addModel.numY!!)).thenReturn(mockReturn)
         val result = exampleController.addFunction(addModel)
-        Assert.assertEquals(result.data!!.toInt(),data["expectedResult"]!!.toString().toDouble().toInt())
+        Assert.assertEquals(result.data!!.toInt(),mockReturn)
 
     }
 }
